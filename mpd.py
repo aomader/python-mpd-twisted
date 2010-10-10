@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from functools import wraps
 from sys import argv, stdout
+from types import GeneratorType
 
 from twisted.internet import protocol, reactor, defer
 from twisted.protocols import basic
@@ -59,6 +61,14 @@ class CommandError(MPDError):
 
 class CommandListError(MPDError):
     pass
+
+
+def iterator_wrapper(function):
+    @wraps(function)
+    def decorated_function(instance, *args, **kwargs):
+        result = function(instance, *args, **kwargs)
+        return result if instance.iterate else list(result)
+    return decorated_function
 
 
 class MPDProtocol(basic.LineReceiver):
@@ -174,10 +184,12 @@ class MPDProtocol(basic.LineReceiver):
         if debug:
             print "sending", parts
         self.sendLine(" ".join(parts))
-    
+
+    @iterator_wrapper
     def parse_pairs(self, lines, separator=": "):
         return (line.split(separator, 1) for line in lines)
 
+    @iterator_wrapper
     def parse_list(self, lines):
         seen = None
         for key, value in self.parse_pairs(lines):
@@ -188,10 +200,12 @@ class MPDProtocol(basic.LineReceiver):
                 seen = key
             yield value
 
+    @iterator_wrapper
     def parse_playlist(self, lines):
         for key, value in self.read_pairs(lines, ":"):
             yield value
 
+    @iterator_wrapper
     def parse_objects(self, lines, delimiters=[]):
         obj = {}
         for key, value in self.parse_pairs(lines):
@@ -240,7 +254,8 @@ class MPDProtocol(basic.LineReceiver):
         return self.parse_objects(lines, ["cpos"])
 
     def parse_command_list_item(self, result):
-        result = list(result)
+        if type(result) == GeneratorType:
+            result = list(result)
         self.command_list_results[0].append(result)
         return result
 
