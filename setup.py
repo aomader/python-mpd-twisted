@@ -23,7 +23,7 @@ setup(
     description="Python MPD client library using Twisted",
     long_description="An MPD (Music Player Daemon) client library, written " \
                      "in pure Python, using Twisted",
-    author="J. Alexander Treuman, JP St. Pierre, Oliver Mader",
+    author="J. Alexander Treuman, Jasper St. Pierre, Oliver Mader",
     author_email="jat@spatialrift.net, jstpierre@mecheye.net, " \
                   "b52@reaktor42.de",
     maintainer="Oliver Mader",
