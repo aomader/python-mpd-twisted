@@ -68,7 +68,7 @@ class MPDProtocol(basic.LineReceiver):
     def __init__(self):
         self.iterate = True
         self.reset()
-        self.state = []
+
         self.commands = {
             # Status Commands
             "clearerror":       self.parse_nothing,
@@ -158,13 +158,15 @@ class MPDProtocol(basic.LineReceiver):
         return lambda *args: self.execute(attr, args, parser)
     
     def execute(self, command, args, parser):
-        if self.command_list is not None and not callable(parser):
+        if self.command_list and not callable(parser):
             raise CommandListError("%s not allowed in command list" % command)
         self.write_command(command, args)
         deferred = defer.Deferred()
-        self.state.append(deferred)
+        (self.state[-1] if self.command_list else self.state).append(deferred)
         if parser is not None:
             deferred.addCallback(parser)
+            if self.command_list:
+                deferred.addCallback(self.parse_command_list_item)
         return deferred
     
     def write_command(self, command, args=[]):
@@ -222,7 +224,7 @@ class MPDProtocol(basic.LineReceiver):
         return pairs[0][1]
     
     def parse_nothing(self, lines):
-        pass
+        return
     
     def parse_songs(self, lines):
         return self.parse_objects(lines, ["file"])
@@ -239,27 +241,38 @@ class MPDProtocol(basic.LineReceiver):
     def parse_changes(self, lines):
         return self.parse_objects(lines, ["cpos"])
 
+    def parse_command_list_item(self, result):
+        result = list(result)
+        self.command_list_results[0].append(result)
+        return result
+
+    def parse_command_list_end(self, lines):
+        return self.command_list_results.pop(0)
+
     def command_list_ok_begin(self):
         if self.command_list:
             raise CommandListError("Already in command list")
         self.write_command("command_list_ok_begin")
         self.command_list = True
+        self.command_list_results.append([])
+        self.state.append([])
 
     def command_list_end(self):
-        if self.command_list:
+        if not self.command_list:
             raise CommandListError("Not in command list")
         self.write_command("command_list_end")
+        deferred = defer.Deferred()
+        deferred.addCallback(self.parse_command_list_end)
+        self.state[-1].append(deferred)
+        self.command_list = False
+        return deferred
     
     def reset(self):
         self.mpd_version = None
         self.command_list = False
+        self.command_list_results = []
         self.buffer = []
         self.state = []
-
-    def pop_and_call_parser(self):
-        parser = self.state.pop(0)
-        parser.callback(self.buffer[:])
-        self.buffer = []
 
     def lineReceived(self, line):
         line = line.decode('utf-8')
@@ -267,21 +280,33 @@ class MPDProtocol(basic.LineReceiver):
         if debug:
             print "received", line
 
+        command_list = isinstance(self.state[0], list)
+        state_list = self.state[0] if command_list else self.state
+
         if line.startswith(HELLO_PREFIX):
             self.mpd_version = line[len(HELLO_PREFIX):].strip()
         
         elif line.startswith(ERROR_PREFIX):
             error = line[len(ERROR_PREFIX):].strip()
-            raise CommandError(error)
+
+            if command_list:
+                state_list[0].errback(CommandError(error))
+                for state in state_list[1:-1]:
+                    state.errback(CommandListError("An earlier command " \
+                                                   "failed."))
+                state_list[-1].errback(CommandListError(error))
+                del self.state[0]
+                del self.command_list_results[0]
+            else:
+                state_list.pop(0).errback(CommandError(error))
         
-        elif self.command_list:
-            if line == NEXT:
-                self.pop_and_call_parser()
-            if line == SUCCESS:
-                self.command_list = False
-        
-        elif line == SUCCESS:
-            self.pop_and_call_parser()
+        elif line == SUCCESS or (command_list and line == NEXT):
+            parser = state_list.pop(0).callback(self.buffer[:])
+            self.buffer = []
+
+            if command_list and line == SUCCESS:
+                del self.state[0]
+                
         else:
             self.buffer.append(line)
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 from distutils.core import setup
 
@@ -52,3 +51,4 @@ setup(
     #platforms=["Independant"],
 )
 
+# vim: set expandtab shiftwidth=4 softtabstop=4 textwidth=79:
