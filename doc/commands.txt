@@ -1,0 +1,114 @@
+For information about what does each command and each parameter does check
+<http://musicpd.org/doc/protocol/>.
+
+
+Status Commands
+===============
+
+clearerror                                     -> None
+currentsong                                    -> dict
+idle                                           -> generator/list of str
+noidle                                         -> None
+status                                         -> dict
+stats                                          -> dict
+
+
+Playback Option Commands
+========================
+
+consume          <bool>                        -> None
+crossfade        <int>                         -> None
+random           <bool>                        -> None
+repeat           <bool>                        -> None
+setvol           <int>                         -> None
+single           <bool>                        -> None
+
+
+Playback Control Commands
+=========================
+
+next                                           -> None
+pause            <bool>                        -> None
+play             [<int>]                       -> None
+playid           [<int>]                       -> None
+previous                                       -> None
+seek             <int>           <int>         -> None
+seekid           <int>           <int>         -> None
+stop                                           -> None
+
+
+Playlist Commands
+=================
+
+add              <str>                         -> None
+addid            <str>           [<int>]       -> str
+clear                                          -> None
+delete           <int>|<range>                 -> None
+deleteid         <int>                         -> None
+move             <int>|<range>   <int>         -> None
+moveid           <int>           <int>         -> None
+playlistfind     <str>           <str>         -> generator/list of dict
+playlistid       [<int>]                       -> generator/list of dict
+playlistinfo     [<int>|<range>]               -> generator/list of dict
+playlistsearch   <str>           <str>         -> generator/list of dict
+plchanges        <int>                         -> generator/list of dict
+plchangesposid   <int>                         -> generator/list of dict
+shuffle          [<range>]                     -> None
+swap             <int>           <int>         -> None
+swapid           <int>           <int>         -> None
+
+
+Stored Playlist Commands
+========================
+
+listplaylist     <str>                         -> generator/list of dict
+listplaylistinfo <str>                         -> generator/list of dict
+listplaylists                                  -> generator/list of dict
+load             <str>                         -> None
+playlistadd      <str>           <str>         -> None
+playlistclear    <str>                         -> None
+playlistdelete   <str>           <int>         -> None
+playlistmove     <str>           <int>   <int> -> None
+rename           <str>           <str>         -> None
+rm               <str>                         -> None
+save             <str>                         -> None
+
+
+Database Commands
+=================
+
+count            <str>           <str>         -> dict
+find             <str>           <str>         -> generator/list of dict
+list             <str>           [<str>]       -> generator/list of dict
+listall          [<str>]                       -> generator/list of dict
+listallinfo      [<str>]                       -> generator/list of dict
+lsinfo           [<str>]                       -> generator/list of dict
+search           <str>           <str>         -> generator/list of dict
+update           [<str>]                       -> str
+
+
+Connection Commands
+===================
+
+close                                          -> None
+kill                                           -> None
+password         <str>                         -> None
+ping                                           -> None
+
+
+Audio Output Commands
+=====================
+
+disableoutput    <int>                         -> None
+enableoutput     <int>                         -> None
+outputs                                        -> generator/list of dict
+
+
+Reflection Commands
+===================
+
+commands                                       -> generator/list of str
+notcommands                                    -> generator/list of str
+tagtypes                                       -> generator/list of str
+urlhandlers                                    -> generator/list of str
+

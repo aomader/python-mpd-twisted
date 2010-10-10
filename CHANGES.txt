@@ -1,5 +1,18 @@
-python-mpd Changes List
-=======================
+python-mpd-twisted Changes List
+===============================
+
+Changes in 0.3.0
+----------------
+
+* installed proper error handling
+* handle command lists in a much better way
+* unicode aware since the protocol itself uses utf-8
+
+Changes in 0.2.x
+----------------
+
+* renamed to python-mpd-twisted to avoid confusion
+* rewritten to use Twisted by Jasper St. Pierre
 
 Changes in 0.2.1
 ----------------

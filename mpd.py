@@ -74,7 +74,7 @@ class MPDProtocol(basic.LineReceiver):
             "clearerror":       self.parse_nothing,
             "currentsong":      self.parse_object,
             "idle":             self.parse_list,
-            "noidle":           None,
+            "noidle":           self.parse_nothing,
             "status":           self.parse_object,
             "stats":            self.parse_object,
             # Playback Option Commands
@@ -84,7 +84,6 @@ class MPDProtocol(basic.LineReceiver):
             "repeat":           self.parse_nothing,
             "setvol":           self.parse_nothing,
             "single":           self.parse_nothing,
-            "volume":           self.parse_nothing,
             # Playback Control Commands
             "next":             self.parse_nothing,
             "pause":            self.parse_nothing,
@@ -102,7 +101,6 @@ class MPDProtocol(basic.LineReceiver):
             "deleteid":         self.parse_nothing,
             "move":             self.parse_nothing,
             "moveid":           self.parse_nothing,
-            "playlist":         self.parse_playlist,
             "playlistfind":     self.parse_songs,
             "playlistid":       self.parse_songs,
             "playlistinfo":     self.parse_songs,
