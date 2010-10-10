@@ -1,5 +1,8 @@
-# Python MPD client library
+# Python MPD client library using Twisted
+#
 # Copyright (C) 2008  J. Alexander Treuman <jat@spatialrift.net>
+# Copyright (C) 2010  Jasper St. Pierre <jstpierre@mecheye.net>
+# Copyright (C) 2010  Oliver Mader <b52@reaktor42.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,18 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# import socket
+from sys import argv, stdout
+
 from twisted.internet import protocol, reactor, defer
 from twisted.protocols import basic
 
-import sys
+__all__ = [
+    "MPDError",
+    "ConnectionError",
+    "ProtocolError",
+    "CommandError",
+    "CommandListError",
+    "MPDProtocol",
+    "MPDFactory"
+]
 
 debug = False
 
-if "--debug" in sys.argv:
-    sys.argv.remove("--debug")
+if "--debug" in argv:
     from twisted.python.log import startLogging
-    startLogging(sys.stdout)
+    startLogging(stdout)
     debug = True
 
 HELLO_PREFIX = "OK MPD "
@@ -48,6 +59,7 @@ class CommandError(MPDError):
 
 class CommandListError(MPDError):
     pass
+
 
 class MPDProtocol(basic.LineReceiver):
 
@@ -156,8 +168,9 @@ class MPDProtocol(basic.LineReceiver):
         return deferred
     
     def write_command(self, command, args=[]):
-        parts = [command]
-        parts += ['"%s"' % escape(str(arg)) for arg in args]
+        parts = [command] + \
+                ['"%s"' % escape(arg.encode('utf-8') if
+                 isinstance(arg, unicode) else str(arg)) for arg in args]
         if debug:
             print "sending", parts
         self.sendLine(" ".join(parts))
@@ -249,8 +262,11 @@ class MPDProtocol(basic.LineReceiver):
         self.buffer = []
 
     def lineReceived(self, line):
+        line = line.decode('utf-8')
+
         if debug:
             print "received", line
+
         if line.startswith(HELLO_PREFIX):
             self.mpd_version = line[len(HELLO_PREFIX):].strip()
         
