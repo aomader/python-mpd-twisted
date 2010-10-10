@@ -35,7 +35,7 @@ setup(
     license="GPL3",
     keywords=["mpd"],
     platforms=["Independent"],
-    install_requires=["twisted>=10.1.0"]
+    install_requires=["Twisted>=10.1.0"]
 )
 
 # vim: set expandtab shiftwidth=4 softtabstop=4 textwidth=79:

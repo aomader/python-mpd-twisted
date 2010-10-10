@@ -254,6 +254,7 @@ class MPDProtocol(basic.LineReceiver):
         return self.parse_objects(lines, ["cpos"])
 
     def parse_command_list_item(self, result):
+        # TODO: find a better way to do this
         if type(result) == GeneratorType:
             result = list(result)
         self.command_list_results[0].append(result)
