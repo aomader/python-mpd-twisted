@@ -294,7 +294,7 @@ class MPDProtocol(basic.LineReceiver):
         if debug:
             print "received", line
 
-        command_list = len(self.state) > 0 and isinstance(self.state[0], list)
+        command_list = self.state and isinstance(self.state[0], list)
         state_list = self.state[0] if command_list else self.state
 
         if line.startswith(HELLO_PREFIX):

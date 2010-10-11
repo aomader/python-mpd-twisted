@@ -19,7 +19,7 @@ CLASSIFIERS = [
 
 setup(
     name="python-mpd-twisted",
-    version="0.3.0",
+    version="0.3.1",
     description="Python MPD client library using Twisted",
     long_description="An MPD (Music Player Daemon) client library, written " \
                      "in pure Python, using Twisted",
