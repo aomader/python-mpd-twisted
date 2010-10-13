@@ -1,29 +1,40 @@
 #!/usr/bin/env python
 
-from mpd import MPDFactory
+# Thats like our first example except that we use MPDFactory
+# to establish a connection. Thats useful if you got long running connections
+# which may get terminated and you don't want to bother yourself reconnecting.
+
 from twisted.internet import reactor
 
-def letsDoSomething(connector):
-    def myFinalListResult(result):
-        print 'Yeah, thats my list of results for each command in the ' \
-              'list %s' % result
+from mpd import MPD_HOST, MPD_PORT, MPDFactory
 
-    def myItemResult(result):
-        print 'Hey the command returned %s' % result
+# Gets called everytime a connection has been established.
+# So e.g. directly after startup or if the connection terminates
+# and the factory reconnected.
+def connectionMade(protocol):
+    # Called after the protocol processed the data without an error.
+    # For a more "synchronous" way of doing this check doc/example3.py
+    def mpdStatus(result):
+        print 'The server\'s status: %s' % result
+        # We drop the current connection and you'll see, that the factory
+        # takes care of the reconnection.
+        protocol.transport.loseConnection()
+    
+    # Register a callback to get the actual result. You may consider to add
+    # an errback as well to handle failures.
+    protocol.status().addCallback(mpdStatus)
 
-    # Every command in the list returns the normal information like
-    # it would have been called normally. The command_list_end command
-    # returns a list of all results from each command in the list.
-    #
-    # BEWARE ...
-    #   command_list operations never return a generator but a list!
-    connector.command_list_ok_begin()
-    connector.add(MY_FILE).addCallback(myItemResult)
-    connector.add(MY_FILE).addCallback(myItemResult)
-    connector.command_list_end().addCallback(myFinalListResult)
+# When a connection dies this function gets called
+def connectionLost(protocol, reason):
+    print 'Connection lost: %s' % reason
 
-m = MPDFactory()
-m.connectionMade = letsDoSomething
+factory = MPDFactory()
 
-reactor.connectTCP('MPD_HOST', 6600)
+# Register our callbacks. No Deferred like in example1, just plain
+# callables.
+factory.connectionMade = connectionMade
+factory.connectionLost = connectionLost
+
+# Connect our factory and run.
+reactor.connectTCP(MPD_HOST, MPD_PORT, factory)
 reactor.run()
