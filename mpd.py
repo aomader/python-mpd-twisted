@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
+from os import getenv
 from sys import argv, stdout
 from types import GeneratorType
 
@@ -25,6 +26,8 @@ from twisted.internet import protocol, reactor, defer
 from twisted.protocols import basic
 
 __all__ = [
+    "MPD_HOST",
+    "MPD_PORT",
     "MPDError",
     "ConnectionError",
     "ProtocolError",
@@ -41,11 +44,14 @@ if "--debug" in argv:
     startLogging(stdout)
     debug = True
 
+
+MPD_HOST = getenv('MPD_HOST', '127.0.0.1')
+MPD_PORT = int(getenv('MPD_PORT', 6600))
+
 HELLO_PREFIX = "OK MPD "
 ERROR_PREFIX = "ACK "
 SUCCESS = "OK"
 NEXT = "list_OK"
-
 
 class MPDError(Exception):
     pass
@@ -324,6 +330,8 @@ class MPDProtocol(basic.LineReceiver):
         else:
             self.buffer.append(line)
 
+
+class MPDFactoryProtocol(MPDProtocol):
     def connectionMade(self):
         if callable(self.factory.connectionMade):
             self.factory.connectionMade(self)
@@ -331,11 +339,13 @@ class MPDProtocol(basic.LineReceiver):
     def connectionLost(self, reason):
         if callable(self.factory.connectionLost):
             self.factory.connectionLost(self, reason)
+    
 
 class MPDFactory(protocol.ReconnectingClientFactory):
-    protocol = MPDProtocol
+    protocol = MPDFactoryProtocol
     connectionMade = None
     connectionLost = None
+
 
 def escape(text):
     return text.replace("\\", "\\\\").replace('"', '\\"')    
