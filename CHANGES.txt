@@ -1,6 +1,13 @@
 python-mpd-twisted Changes List
 ===============================
 
+Changes in 0.3.2
+----------------
+
+* Removed MPDProtocol's dependencies to MPDFactory so it can be used
+  standalone
+* Updated the examples
+
 Changes in 0.3.1
 ----------------
 
