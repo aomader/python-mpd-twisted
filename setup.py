@@ -29,7 +29,7 @@ setup(
     maintainer="Oliver Mader",
     maintainer_email="b52@reaktor42.de",
     url="https://code.reaktor42.de/projects/python-mpd-twisted",
-    download_url="https://code.reaktor42.de/projects/python-mpd-twisted",
+    download_url="http://pypi.python.org/pypi/python-mpd-twisted",
     py_modules=["mpd"],
     classifiers=CLASSIFIERS,
     license="GPL3",
