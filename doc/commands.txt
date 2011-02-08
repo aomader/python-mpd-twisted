@@ -18,10 +18,14 @@ Playback Option Commands
 
 consume          <bool>                        -> None
 crossfade        <int>                         -> None
+mixrampdb        <float>                       -> None
+mixrampdelay     <int/string>                  -> None
 random           <bool>                        -> None
 repeat           <bool>                        -> None
 setvol           <int>                         -> None
 single           <bool>                        -> None
+replay_gain_mode <string>                      -> None
+replay_gain_status                             -> dict
 
 
 Playback Control Commands
@@ -79,12 +83,24 @@ Database Commands
 
 count            <str>           <str>         -> dict
 find             <str>           <str>         -> generator/list of dict
+findadd          <str>           <str>         -> None
 list             <str>           [<str>]       -> generator/list of dict
 listall          [<str>]                       -> generator/list of dict
 listallinfo      [<str>]                       -> generator/list of dict
 lsinfo           [<str>]                       -> generator/list of dict
 search           <str>           <str>         -> generator/list of dict
 update           [<str>]                       -> str
+rescan           [<str>]                       -> str
+
+
+Stickers
+========
+
+sticker_get      <str>  <str>  <str>           -> str
+sticker_set      <str>  <str>  <str>    <str>  -> None
+sticker_delete   <str>  <str>  [<str>]         -> None
+sticker_list     <str>  <str>                  -> dict
+sticker_find     <str>  <str>  <str>           -> generator/list of dict
 
 
 Connection Commands
@@ -111,4 +127,5 @@ commands                                       -> generator/list of str
 notcommands                                    -> generator/list of str
 tagtypes                                       -> generator/list of str
 urlhandlers                                    -> generator/list of str
+decoders                                       -> generator/list of dict
 

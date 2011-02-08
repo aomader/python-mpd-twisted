@@ -2,7 +2,7 @@
 #
 # Copyright (C) 2008  J. Alexander Treuman <jat@spatialrift.net>
 # Copyright (C) 2010  Jasper St. Pierre <jstpierre@mecheye.net>
-# Copyright (C) 2010  Oliver Mader <b52@reaktor42.de>
+# Copyright (C) 2010,2011  Oliver Mader <b52@reaktor42.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -87,89 +87,102 @@ class MPDProtocol(basic.LineReceiver):
 
         self.commands = {
             # Status Commands
-            "clearerror":       self.parse_nothing,
-            "currentsong":      self.parse_object,
-            "idle":             self.parse_list,
-            "noidle":           self.parse_nothing,
-            "status":           self.parse_object,
-            "stats":            self.parse_object,
+            "clearerror":           self.parse_nothing,
+            "currentsong":          self.parse_object,
+            "idle":                 self.parse_list,
+            "noidle":               self.parse_nothing,
+            "status":               self.parse_object,
+            "stats":                self.parse_object,
             # Playback Option Commands
-            "consume":          self.parse_nothing,
-            "crossfade":        self.parse_nothing,
-            "random":           self.parse_nothing,
-            "repeat":           self.parse_nothing,
-            "setvol":           self.parse_nothing,
-            "single":           self.parse_nothing,
+            "consume":              self.parse_nothing,
+            "crossfade":            self.parse_nothing,
+            "mixrampdb":            self.parse_nothing,
+            "mixrampdelay":         self.parse_nothing,
+            "random":               self.parse_nothing,
+            "repeat":               self.parse_nothing,
+            "setvol":               self.parse_nothing,
+            "single":               self.parse_nothing,
+            "replay_gain_mode":     self.parse_nothing,
+            "replay_gain_status":   self.parse_object,
             # Playback Control Commands
-            "next":             self.parse_nothing,
-            "pause":            self.parse_nothing,
-            "play":             self.parse_nothing,
-            "playid":           self.parse_nothing,
-            "previous":         self.parse_nothing,
-            "seek":             self.parse_nothing,
-            "seekid":           self.parse_nothing,
-            "stop":             self.parse_nothing,
+            "next":                 self.parse_nothing,
+            "pause":                self.parse_nothing,
+            "play":                 self.parse_nothing,
+            "playid":               self.parse_nothing,
+            "previous":             self.parse_nothing,
+            "seek":                 self.parse_nothing,
+            "seekid":               self.parse_nothing,
+            "stop":                 self.parse_nothing,
             # Playlist Commands
-            "add":              self.parse_nothing,
-            "addid":            self.parse_item,
-            "clear":            self.parse_nothing,
-            "delete":           self.parse_nothing,
-            "deleteid":         self.parse_nothing,
-            "move":             self.parse_nothing,
-            "moveid":           self.parse_nothing,
-            "playlistfind":     self.parse_songs,
-            "playlistid":       self.parse_songs,
-            "playlistinfo":     self.parse_songs,
-            "playlistsearch":   self.parse_songs,
-            "plchanges":        self.parse_songs,
-            "plchangesposid":   self.parse_changes,
-            "shuffle":          self.parse_nothing,
-            "swap":             self.parse_nothing,
-            "swapid":           self.parse_nothing,
+            "add":                  self.parse_nothing,
+            "addid":                self.parse_item,
+            "clear":                self.parse_nothing,
+            "delete":               self.parse_nothing,
+            "deleteid":             self.parse_nothing,
+            "move":                 self.parse_nothing,
+            "moveid":               self.parse_nothing,
+            "playlistfind":         self.parse_songs,
+            "playlistid":           self.parse_songs,
+            "playlistinfo":         self.parse_songs,
+            "playlistsearch":       self.parse_songs,
+            "plchanges":            self.parse_songs,
+            "plchangesposid":       self.parse_changes,
+            "shuffle":              self.parse_nothing,
+            "swap":                 self.parse_nothing,
+            "swapid":               self.parse_nothing,
             # Stored Playlist Commands
-            "listplaylist":     self.parse_list,
-            "listplaylistinfo": self.parse_songs,
-            "listplaylists":    self.parse_playlists,
-            "load":             self.parse_nothing,
-            "playlistadd":      self.parse_nothing,
-            "playlistclear":    self.parse_nothing,
-            "playlistdelete":   self.parse_nothing,
-            "playlistmove":     self.parse_nothing,
-            "rename":           self.parse_nothing,
-            "rm":               self.parse_nothing,
-            "save":             self.parse_nothing,
+            "listplaylist":         self.parse_list,
+            "listplaylistinfo":     self.parse_songs,
+            "listplaylists":        self.parse_playlists,
+            "load":                 self.parse_nothing,
+            "playlistadd":          self.parse_nothing,
+            "playlistclear":        self.parse_nothing,
+            "playlistdelete":       self.parse_nothing,
+            "playlistmove":         self.parse_nothing,
+            "rename":               self.parse_nothing,
+            "rm":                   self.parse_nothing,
+            "save":                 self.parse_nothing,
             # Database Commands
-            "count":            self.parse_object,
-            "find":             self.parse_songs,
-            "list":             self.parse_list,
-            "listall":          self.parse_database,
-            "listallinfo":      self.parse_database,
-            "lsinfo":           self.parse_database,
-            "search":           self.parse_songs,
-            "update":           self.parse_item,
+            "count":                self.parse_object,
+            "find":                 self.parse_songs,
+            "findadd":              self.parse_nothing,
+            "list":                 self.parse_list,
+            "listall":              self.parse_database,
+            "listallinfo":          self.parse_database,
+            "lsinfo":               self.parse_database,
+            "search":               self.parse_songs,
+            "update":               self.parse_item,
+            "rescan":               self.parse_item,
+            # Stickers
+            "sticker get":          self.parse_sticker,
+            "sticker set":          self.parse_nothing,
+            "sticker delete":       self.parse_nothing,
+            "sticker list":         self.parse_stickers,
+            "sticker find":         self.parse_stickers_find,
             # Connection Commands
-            "close":            None,
-            "kill":             None,
-            "password":         self.parse_nothing,
-            "ping":             self.parse_nothing,
+            "close":                None,
+            "kill":                 None,
+            "password":             self.parse_nothing,
+            "ping":                 self.parse_nothing,
             # Audio Output Commands
-            "disableoutput":    self.parse_nothing,
-            "enableoutput":     self.parse_nothing,
-            "outputs":          self.parse_outputs,
+            "disableoutput":        self.parse_nothing,
+            "enableoutput":         self.parse_nothing,
+            "outputs":              self.parse_outputs,
             # Reflection Commands
-            "commands":         self.parse_list,
-            "notcommands":      self.parse_list,
-            "tagtypes":         self.parse_list,
-            "urlhandlers":      self.parse_list,
+            "commands":             self.parse_list,
+            "notcommands":          self.parse_list,
+            "tagtypes":             self.parse_list,
+            "urlhandlers":          self.parse_list,
+            "decoders":             self.parse_decoders,
         }
 
     def __getattr__(self, attr):
-        try:
-            parser = self.commands[attr]
-        except KeyError:
+        if attr not in self.commands:
+            attr = attr.replace("_", " ")
+        if attr not in self.commands:
             raise AttributeError("'%s' object has no attribute '%s'" %
                                  (self.__class__.__name__, attr))
-        return lambda *args: self.execute(attr, args, parser)
+        return lambda *args: self.execute(attr, args, self.commands[attr])
     
     def execute(self, command, args, parser):
         if self.command_list and not callable(parser):
@@ -258,6 +271,21 @@ class MPDProtocol(basic.LineReceiver):
 
     def parse_changes(self, lines):
         return self.parse_objects(lines, ["cpos"])
+
+    def parse_decoders(self, lines):
+        return self.parse_objects(lines, ["plugin"])
+
+    def parse_sticker(self, lines):
+        return self.parse_item(lines).split("=", 1)[1]
+
+    def parse_stickers(self, lines):
+        return dict(x.split("=", 1) for x in self.parse_list(lines))
+
+    @iterator_wrapper
+    def parse_stickers_find(self, lines):
+        for x in self.parse_objects(lines, ["file"]):
+            x["sticker"] = x["sticker"].split("=", 1)[1]
+            yield x
 
     def parse_command_list_item(self, result):
         # TODO: find a better way to do this
