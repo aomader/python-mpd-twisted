@@ -1,6 +1,16 @@
 python-mpd-twisted Changes List
 ===============================
 
+Changes in 0.4
+--------------
+
+* Fully support MPD protocol 0.16
+* Added playback commands mixrampdb, mixrampdelay, replay_gain_mode and
+  replay_gain_status
+* Added database commands findadd and rescan
+* Added all sticker commands
+* Added reflection command decoders
+
 Changes in 0.3.2
 ----------------
 
