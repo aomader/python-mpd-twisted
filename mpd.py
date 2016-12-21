@@ -111,6 +111,7 @@ class MPDProtocol(basic.LineReceiver):
             "playid":               self.parse_nothing,
             "previous":             self.parse_nothing,
             "seek":                 self.parse_nothing,
+            "seekcur":              self.parse_nothing,
             "seekid":               self.parse_nothing,
             "stop":                 self.parse_nothing,
             # Playlist Commands
